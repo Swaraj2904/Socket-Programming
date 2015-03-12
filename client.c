@@ -64,17 +64,18 @@ int main(int argc, char *argv[])
     /* Analyzing Response */
     if(buffer_in[0] == '1')
     {
-         if(buffer_in[1] == '0')
-              error("Protocol Error");
-         else
-              error("UPC not found in database");
+        if(buffer_in[1] == '0')
+            error("Protocol Error");
+        else
+            error("UPC not found in database");
     }
     if(buffer_out[0] == '0')
     {
-         strncpy(price, buffer_in + 1, 4);
-         strncpy(name, buffer_in + 5, strlen(buffer_in) - 5);
-         strncpy(quantity, buffer_out + 4, 4);
-         totalc += atoi(price) * atoi(quantity);
+        strncpy(price, buffer_in + 1, 4);
+        strncpy(name, buffer_in + 5, strlen(buffer_in) - 5);
+        strncpy(quantity, buffer_out + 4, 4);
+        totalc += atoi(price) * atoi(quantity);
+        printf("\n%d%s%d",upc_code, price)
     }
     else
     {
