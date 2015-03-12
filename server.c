@@ -7,6 +7,7 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <fstream.h>
 
 void error(const char *msg)
 {
@@ -25,6 +26,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"ERROR, no port provided\n");
       exit(1);
    }
+   
    /* Creating socket for server */
    sockfd = socket(AF_INET, SOCK_STREAM, 0);
    if (sockfd < 0) 
@@ -36,19 +38,26 @@ int main(int argc, char *argv[])
    serv_addr.sin_port = htons(portno);
    if (bind(sockfd, (struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
       error("ERROR on binding");
-   /* Listening to specified port and accepting client request */        
+      
+   /* Listening to specified port */         
    listen(sockfd,5);
+   
+   /* accepting client request */
    clilen = sizeof(cli_addr);
    newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
    if (newsockfd < 0) 
       error("ERROR on accept");
+      
    /* reading data from client */
    bzero(buffer,256);
    n = read(newsockfd,buffer,255);
    if (n < 0) 
       error("ERROR reading from socket");
+      
+   /* analyzing data */   
    if(buffer[0] == '1')
    {
+      fclose(fp);
       item = "0" + total;
       n = write(newsockfd,item,10);
       if (n < 0) 
@@ -57,17 +66,38 @@ int main(int argc, char *argv[])
    }
    else
    {
+      int present = 0;
+      char buffer[256];
       char upc_code[3];
+      char num[4];
+      char name[30];
+      char price[4];
+      int i = 0;
       strncpy(upc_code, buffer+1, 3);
-      strncpy(num, buffer+4, 3);
+      strncpy(num, buffer+4, 4);
+      FILE *fp = fopen("data.txt","w+");
       /* Searching the database for the upc code */
-      if(upc_code == !present)
-         printf("UPC is not in database");
-      price = extract from file;
+      while(!feof(fp))
+      {
+         if (fread(buffer, 3, 1, fp) != 1)
+            error("Error in read");
+         if(buffer == upc_code)
+            present = 1;
+         fseek(fp, (i+1)*35, SEEK_SET);
+      }
+      if(!present)
+      {
+         //printf("UPC is not in database");
+         n = write(newsockfd,"11",2);
+         if (n < 0) 
+            error("ERROR writing to socket");
+      }
+      if (fread(price, 4, 1, fp) != 1)
+         error("Error in read");
       name = extract from file;
       total = price * atoi(num);
       item = "0" + price + name; 
-      n = write(newsockfd,item,100);
+      n = write(newsockfd,item,35);
       if (n < 0) 
          error("ERROR writing to socket");
    }
@@ -75,6 +105,6 @@ int main(int argc, char *argv[])
    n = write(newsockfd,"I got your message",18);
    if (n < 0) error("ERROR writing to socket");
    */
-   close(sockfd);y
+   close(sockfd);
    return 0; 
 }
