@@ -50,10 +50,34 @@ int main(int argc, char *argv[])
      n = read(newsockfd,buffer,255);
      if (n < 0) 
       error("ERROR reading from socket");
-     printf("Here is the message: %s\n",buffer);
+      if(buffer[0] == 1)
+      {
+         item = "0" + total;
+         n = write(newsockfd,item,10);
+         if (n < 0) 
+            error("ERROR writing to socket");
+         close(newsockfd);
+      }
+     else
+     {
+         char upc_code[3];
+         strncpy(upc_code, buffer+1, 3);
+         strncpy(num, buffer+4, 3);
+         /* Searching the database for the upc code */
+         if(upc_code == !present)
+            printf("UPC is not in database");
+         price = extract from file;
+         name = extract from file;
+         total = price * atoi(num);
+         item = "0" + price + name; 
+         n = write(newsockfd,item,100);
+         if (n < 0) 
+            error("ERROR writing to socket");
+     }
+     /*printf("Here is the message: %s\n",buffer);
      n = write(newsockfd,"I got your message",18);
      if (n < 0) error("ERROR writing to socket");
-     close(newsockfd);
+     */
      close(sockfd);
      return 0; 
 }
