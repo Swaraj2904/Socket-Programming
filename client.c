@@ -78,10 +78,12 @@ int main(int argc, char *argv[])
     }
     else
     {
-         strncpy(total, buffer_in + 1, 10);
-         totals = atoi(total);
-         if(totalc != totals)
-              error("Error in computation");
+        strncpy(total, buffer_in + 1, 10);
+        totals = atoi(total);
+        if(totalc != totals)
+            error("Error in computation");
+        else
+            prinf("\nThe total amount is %d",totalc);
     }
     //printf("%s\n", buffer);
     close(sockfd);
