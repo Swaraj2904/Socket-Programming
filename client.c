@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
         if(buffer_in[1] == '0')
             error("Protocol Error");
         else
-            error("UPC not found in database");
+            printf("UPC not found in database");
     }
     if(buffer_out[0] == '0')
     {
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
         strncpy(name, buffer_in + 5, strlen(buffer_in) - 5);
         strncpy(quantity, buffer_out + 4, 4);
         totalc += atoi(price) * atoi(quantity);
-        printf("\n%d%s%d",upc_code, price)
+        printf("\n%s  %s  %s %s %d",upc_code, name, price, num, total);
     }
     else
     {
