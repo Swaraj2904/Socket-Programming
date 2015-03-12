@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     serv_addr.sin_port = htons(portno);
     if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
         error("ERROR connecting");
-
+    do{
     /* Sending request */
     printf("Enter the transaction: ");
     bzero(buffer_out, 256);
@@ -64,10 +64,13 @@ int main(int argc, char *argv[])
     /* Analyzing Response */
     if(buffer_in[0] == '1')
     {
-        if(buffer_in[1] == '0')
-            error("Protocol Error");
-        else
+        if(buffer_in[1] == '1')
             printf("UPC not found in database");
+        else
+        {
+            error("Protocol Error");
+            close(sockfd);
+        }
     }
     if(buffer_out[0] == '0')
     {
@@ -86,6 +89,7 @@ int main(int argc, char *argv[])
         else
             printf("\nThe total is %d", totalc);
     }
+    }while(buffer_out[0] != '1');
     //printf("%s\n", buffer);
     close(sockfd);
     return 0;
