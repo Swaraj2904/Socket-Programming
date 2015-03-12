@@ -38,7 +38,8 @@ int main(int argc, char *argv[])
    serv_addr.sin_port = htons(portno);
    if (bind(sockfd, (struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
       error("ERROR on binding");
-      
+   while(1)
+   {
    /* Listening to specified port */         
    listen(sockfd,5);
    
@@ -63,6 +64,7 @@ int main(int argc, char *argv[])
       if (n < 0) 
          error("ERROR writing to socket");
       close(newsockfd);
+      close(sockfd);
    }
    else
    {
@@ -72,6 +74,7 @@ int main(int argc, char *argv[])
       char num[4];
       char name[30];
       char price[4];
+      char item[35]; 
       int i = 0;
       strncpy(upc_code, buffer+1, 3);
       strncpy(num, buffer+4, 4);
@@ -82,8 +85,12 @@ int main(int argc, char *argv[])
          if (fread(buffer, 3, 1, fp) != 1)
             error("Error in read");
          if(buffer == upc_code)
+         {
             present = 1;
-         fseek(fp, (i+1)*35, SEEK_SET);
+            break;
+         }
+         i++;
+         fseek(fp, i*40, SEEK_SET);
       }
       if(!present)
       {
@@ -92,19 +99,24 @@ int main(int argc, char *argv[])
          if (n < 0) 
             error("ERROR writing to socket");
       }
+      else{
+      fseek(fp, i*40 + 5, SEEK_SET);
       if (fread(price, 4, 1, fp) != 1)
          error("Error in read");
-      name = extract from file;
+      fseek(fp, i*40 + 11, SEEK_SET);
+      if (fread(name, 30, 1, fp) != 1)
+         error("Error in read");
       total = price * atoi(num);
-      item = "0" + price + name; 
-      n = write(newsockfd,item,35);
+      item = strcat(strcat('0', price), name);
+      n = write(newsockfd, item, 35);
       if (n < 0) 
          error("ERROR writing to socket");
+      }
    }
    /*printf("Here is the message: %s\n",buffer);
    n = write(newsockfd,"I got your message",18);
    if (n < 0) error("ERROR writing to socket");
    */
-   close(sockfd);
+   }
    return 0; 
 }
