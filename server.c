@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
    int sockfd, newsockfd, portno;
    socklen_t clilen;
    char buffer[256];
-   char buff[256];
+   char *buff;
    FILE *fp;
    int present = 0;
  
@@ -72,7 +72,6 @@ int main(int argc, char *argv[])
    {
       fclose(fp);
       item[0] = '0';
-      
       bzero(total_s,10);
       //itoa(total,total_s,10);
       n = write(newsockfd,item,35);
@@ -90,8 +89,9 @@ int main(int argc, char *argv[])
       /* Searching the database for the upc code */
       while(!feof(fp))
       {
+         buff = (char*)malloc(3*sizeof(char));
          if (fread(buff, 3, 1, fp) != 1)
-            error("Error in read1");
+            error("ERROR in read1");
          if( strcmp(buff,upc_code) == 0 )
          {
             present = 1;
@@ -112,10 +112,10 @@ int main(int argc, char *argv[])
       {
       fseek(fp, i*40 + 5, SEEK_SET);
       if (fread(price, 4, 1, fp) != 1)
-         error("Error in read2");
+         error("ERROR in read2");
       fseek(fp, i*40 + 11, SEEK_SET);
       if (fread(name, 30, 1, fp) != 1)
-         error("Error in read3");
+         error("ERROR in read3");
       total += atoi(price) * atoi(num);
       
       
