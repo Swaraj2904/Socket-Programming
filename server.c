@@ -7,7 +7,7 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <fstream.h>
+//#include <fstream.h>
 
 void error(const char *msg)
 {
@@ -20,6 +20,18 @@ int main(int argc, char *argv[])
    int sockfd, newsockfd, portno;
    socklen_t clilen;
    char buffer[256];
+   char buff[256];
+   FILE *fp;
+   int present = 0;
+ 
+   char upc_code[3];
+   char num[4];
+   char name[30];
+   char price[4];
+   char item[35]; 
+   int i = 0;
+   int total;
+   char total_s[10];
    struct sockaddr_in serv_addr, cli_addr;
    int n;
    if (argc < 2) {
@@ -59,8 +71,11 @@ int main(int argc, char *argv[])
    if(buffer[0] == '1')
    {
       fclose(fp);
-      item = "0" + total;
-      n = write(newsockfd,item,10);
+      item[0] = '0';
+      
+      bzero(total_s,10);
+      //itoa(total,total_s,10);
+      n = write(newsockfd,item,35);
       if (n < 0) 
          error("ERROR writing to socket");
       close(newsockfd);
@@ -68,46 +83,44 @@ int main(int argc, char *argv[])
    }
    else
    {
-      int present = 0;
-      char buffer[256];
-      char upc_code[3];
-      char num[4];
-      char name[30];
-      char price[4];
-      char item[35]; 
-      int i = 0;
+      
       strncpy(upc_code, buffer+1, 3);
       strncpy(num, buffer+4, 4);
-      FILE *fp = fopen("data.txt","w+");
+      fp = fopen("data.txt","r");
       /* Searching the database for the upc code */
       while(!feof(fp))
       {
-         if (fread(buffer, 3, 1, fp) != 1)
-            error("Error in read");
-         if(buffer == upc_code)
+         if (fread(buff, 3, 1, fp) != 1)
+            error("Error in read1");
+         if( strcmp(buff,upc_code) == 0 )
          {
             present = 1;
             break;
          }
          i++;
          fseek(fp, i*40, SEEK_SET);
+         
       }
-      if(!present)
+      if(present == 0)
       {
          //printf("UPC is not in database");
-         n = write(newsockfd,"11",2);
+         n = write(newsockfd,"1UPC is not found in database",27);
          if (n < 0) 
             error("ERROR writing to socket");
       }
-      else{
+      else
+      {
       fseek(fp, i*40 + 5, SEEK_SET);
       if (fread(price, 4, 1, fp) != 1)
-         error("Error in read");
+         error("Error in read2");
       fseek(fp, i*40 + 11, SEEK_SET);
       if (fread(name, 30, 1, fp) != 1)
-         error("Error in read");
-      total = price * atoi(num);
-      item = strcat(strcat('0', price), name);
+         error("Error in read3");
+      total += atoi(price) * atoi(num);
+      
+      
+      
+      item[0] = '0';
       n = write(newsockfd, item, 35);
       if (n < 0) 
          error("ERROR writing to socket");
