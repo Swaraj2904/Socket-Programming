@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
       while(!feof(fp))
       {
          buff = (char*)malloc(3*sizeof(char));
-         if (fread(buff, 3, 1, fp) != 1)
+         if (fread(buff, 3, 1, fp) == 0)
             error("ERROR in read1");
          if( strcmp(buff,upc_code) == 0 )
          {
@@ -111,10 +111,10 @@ int main(int argc, char *argv[])
       else
       {
       fseek(fp, i*40 + 5, SEEK_SET);
-      if (fread(price, 4, 1, fp) != 1)
+      if (fread(price, 4, 1, fp) == 0)
          error("ERROR in read2");
       fseek(fp, i*40 + 11, SEEK_SET);
-      if (fread(name, 30, 1, fp) != 1)
+      if (fread(name, 30, 1, fp) == 0)
          error("ERROR in read3");
       total += atoi(price) * atoi(num);
       
