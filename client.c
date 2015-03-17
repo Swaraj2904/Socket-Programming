@@ -21,6 +21,13 @@ int main(int argc, char *argv[])
     int totalc = 0;/* Total computed by client */
     int totals;/* Total computed by server */
     char buffer[256];
+    char buffer_in[256];
+    char buffer_out[256];
+    char upc_code[3];
+    char buff[3];
+    char price[4];
+    char name[30];
+    char quantity[4];
     if (argc < 3) {
        fprintf(stderr,"usage %s hostname port\n", argv[0]);
        exit(0);
